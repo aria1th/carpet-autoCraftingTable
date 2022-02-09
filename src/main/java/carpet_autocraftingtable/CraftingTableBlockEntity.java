@@ -55,11 +55,10 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     public static void init() { } // registers BE type
 
     @Override
-    public NbtCompound writeNbt(NbtCompound tag) {
+    public void writeNbt(NbtCompound tag) {
         super.writeNbt(tag);
         Inventories.writeNbt(tag, inventory);
         tag.put("Output", output.writeNbt(new NbtCompound()));
-        return tag;
     }
 
     @Override
@@ -193,7 +192,13 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     private Optional<CraftingRecipe> getCurrentRecipe() {
         if (this.world == null) return Optional.empty();
-        Optional<CraftingRecipe> optionalRecipe = this.world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
+        Optional<CraftingRecipe> optionalRecipe;
+        if ((optionalRecipe = Optional.ofNullable((CraftingRecipe) getLastRecipe())).isPresent()) {
+            if (RecipeType.CRAFTING.match(optionalRecipe.get(), world, craftingInventory).isPresent()) {
+                return optionalRecipe;
+            }
+        }
+        optionalRecipe = this.world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
         optionalRecipe.ifPresent(this::setLastRecipe);
         return optionalRecipe;
     }
@@ -214,7 +219,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
             if (!remainingStack.isEmpty()) {
                 if (current.isEmpty()) {
                     inventory.set(i, remainingStack);
-                } else if (ItemStack.areItemsEqualIgnoreDamage(current, remainingStack) && ItemStack.areTagsEqual(current, remainingStack)) {
+                } else if (ItemStack.areItemsEqualIgnoreDamage(current, remainingStack) && ItemStack.areItemsEqual(current, remainingStack)) {
                     current.increment(remainingStack.getCount());
                 } else {
                     ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), remainingStack);
