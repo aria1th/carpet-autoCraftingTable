@@ -55,10 +55,11 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     public static void init() { } // registers BE type
 
     @Override
-    public void writeNbt(NbtCompound tag) {
+    public NbtCompound writeNbt(NbtCompound tag) {
         super.writeNbt(tag);
         Inventories.writeNbt(tag, inventory);
         tag.put("Output", output.writeNbt(new NbtCompound()));
+        return tag;
     }
 
     @Override
@@ -194,7 +195,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
         if (this.world == null) return Optional.empty();
         Optional<CraftingRecipe> optionalRecipe;
         if ((optionalRecipe = Optional.ofNullable((CraftingRecipe) getLastRecipe())).isPresent()) {
-            if (RecipeType.CRAFTING.match(optionalRecipe.get(), world, craftingInventory).isPresent()) {
+            if (RecipeType.CRAFTING.get(optionalRecipe.get(), world, craftingInventory).isPresent()) {
                 return optionalRecipe;
             }
         }
