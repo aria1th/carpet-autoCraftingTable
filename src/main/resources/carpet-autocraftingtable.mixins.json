@@ -3,6 +3,7 @@
   "package": "carpet_autocraftingtable.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "AbstractBlockMixin",
     "BootStrapMixin",
     "CraftingInventoryMixin",
     "CraftingTableBlockMixin",
