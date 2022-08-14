@@ -11,7 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class AbstractBlockMixin {
 	@Inject(method = "hasBlockEntity", at = @At(value = "HEAD"), cancellable = true)
 	private void onHasBlockEntity(CallbackInfoReturnable<Boolean> cir){
-		if (((AbstractBlock.AbstractBlockState)(Object)this).isOf(Blocks.FLETCHING_TABLE)){
+		AbstractBlock.AbstractBlockState abstractBlockState = ((AbstractBlock.AbstractBlockState)(Object)this);
+		if (abstractBlockState.isOf(Blocks.CRAFTING_TABLE) || abstractBlockState.isOf(Blocks.SMITHING_TABLE)){
 			cir.setReturnValue(false);
 		}
 	}
